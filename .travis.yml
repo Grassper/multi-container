@@ -1,0 +1,17 @@
+sudo: required
+language: generic 
+services:
+  - docker
+
+
+before_install: 
+  - docker build -t grassper/react-test -f ./client/Dockerfile.local ./client
+
+script: 
+  - docker run -e CI=true grassper/react-test npm test
+
+after_success: 
+  - docker build -t grassper/multi-client ./client
+  - docker build -t grassper/multi-nginx ./nginx
+  - docker build -t grassper/multi-server ./server
+  - docker build -t grassper/multi-worker ./worker
