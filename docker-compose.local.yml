@@ -14,9 +14,9 @@ services:
     ports:
       - "3080:80"
     depends_on:
-      - react-app
+      - client
       - server
-  react-app:
+  client:
     build:
       context: ./client
       dockerfile: Dockerfile.local
