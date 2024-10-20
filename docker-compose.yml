@@ -1,50 +1,34 @@
-version: "3"
-services:
-  postgres:
-    image: "postgres:latest"
-    environment:
-      - POSTGRES_PASSWORD=${PGPASSWORD}
-  redis:
-    image: "redis:latest"
-  nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile.local
-    restart: always
-    ports:
-      - "3080:80"
-    depends_on:
-      - client
-      - server
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile.local
-    volumes:
-      - /app/node_modules
-      - ./client:/app
-  server:
-    build:
-      context: ./server
-      dockerfile: Dockerfile.local
-    volumes:
-      - /app/node_modules
-      - ./server:/app
-    environment:
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - PGUSER=${PGUSER}
-      - PGHOST=${PGHOST}
-      - PGDATABASE=${PGDATABASE}
-      - PGPASSWORD=${PGPASSWORD}
-      - PGPORT=${PGPORT}
-  worker:
-    build:
-      context: ./worker
-      dockerfile: Dockerfile.local
-    volumes:
-      - /app/node_modules
-      - ./worker:/app
-    environment:
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
+  services:
+    nginx:
+      image: "grassper/multi-nginx"
+      restart: always
+      hostname: nginx
+      mem_limit: 128m
+      ports:
+        - "80:80"
+      depends_on:
+        - client
+        - server
+    client:
+      image: "grassper/multi-client"
+      hostname: client
+      mem_limit: 128m
+    server:
+      image: "grassper/multi-server"
+      hostname: server
+      mem_limit: 128m
+      environment:
+        - REDIS_HOST=${REDIS_HOST}
+        - REDIS_PORT=${REDIS_PORT}
+        - PGUSER=${PGUSER}
+        - PGHOST=${PGHOST}
+        - PGDATABASE=${PGDATABASE}
+        - PGPASSWORD=${PGPASSWORD}
+        - PGPORT=${PGPORT}
+    worker:
+      image: "grassper/multi-worker"
+      hostname: worker
+      mem_limit: 128m
+      environment:
+        - REDIS_HOST=${REDIS_HOST}
+        - REDIS_PORT=${REDIS_PORT}
